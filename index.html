@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PaperNest — by Agastya</title>
+  <style>
+    :root{
+      /* ---- Light, clean, formal, motivational ---- */
+      --bg: #f7f9fc;               /* page bg */
+      --panel: #ffffff;            /* side + modals */
+      --card: #ffffff;             /* cards */
+      --muted: #6b7280;            /* text-muted (gray-500) */
+      --text: #111827;             /* text (gray-900) */
+      --accent: #2563eb;           /* blue-600 */
+      --accent-2: #1d4ed8;         /* blue-700 */
+      --accent-3: #0ea5e9;         /* sky-500 for pills active */
+      --good: #16a34a;             /* green-600 */
+      --warn: #d97706;             /* amber-600 */
+      --danger: #dc2626;           /* red-600 */
+      --neutral: #9ca3af;          /* gray-400 */
+      --chip: #eef2ff;             /* indigo-50 */
+      --shadow: 0 10px 30px rgba(17,24,39,.08);
+      --radius: 14px;
+      --border: #e5e7eb;           /* gray-200 */
+      --ring: rgba(37,99,235,.35);
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+                   "Apple Color Emoji","Segoe UI Emoji";
+      color:var(--text);
+      background:
+        radial-gradient(800px 380px at 10% -8%, rgba(37,99,235,.06), transparent 60%),
+        radial-gradient(1000px 520px at 120% -10%, rgba(14,165,233,.08), transparent 60%),
+        var(--bg);
+    }
+
+    /* Header + Nav */
+    header{
+      position:sticky;top:0;z-index:40;
+      background:linear-gradient(90deg,var(--panel),#f8fbff);
+      border-bottom:1px solid var(--border);
+      padding:12px 16px;
+      display:flex;align-items:center;gap:14px;justify-content:space-between;
+    }
+    .brand{display:flex;align-items:center;gap:10px}
+    .brand .logo{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:linear-gradient(180deg,var(--accent),var(--accent-2));color:white;font-weight:800;box-shadow:var(--shadow)}
+    .brand .title{font-size:18px;font-weight:800;letter-spacing:.2px}
+    .subtitle{opacity:.8;font-size:12px}
+
+    .nav{display:flex;gap:8px;align-items:center}
+    .tab{appearance:none;border:1px solid var(--border);background:white;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:600}
+    .tab.active{border-color:var(--accent);box-shadow:0 0 0 3px var(--ring)}
+
+    /* Container */
+    .container{display:grid;grid-template-columns:300px 1fr;gap:16px;padding:16px;max-width:1400px;margin:0 auto}
+
+    aside{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:14px;position:sticky;top:76px;align-self:start}
+    aside h3{margin:6px 0 8px;font-size:14px;color:#0f172a}
+    .section{margin-bottom:14px}
+
+    .chips{display:flex;flex-wrap:wrap;gap:8px}
+    .chip{background:var(--chip);border:1px solid var(--border);padding:6px 10px;border-radius:999px;cursor:pointer;font-size:12px;user-select:none}
+    .chip.active{background:#dbeafe;border-color:#bfdbfe}
+
+    .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0}
+    .toolbar input[type="search"]{flex:1;min-width:260px;padding:10px 12px;background:white;border:1px solid var(--border);border-radius:10px;color:var(--text)}
+    .btn{appearance:none;border:1px solid var(--border);background:linear-gradient(180deg,var(--accent),var(--accent-2));color:white;padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:700;box-shadow:var(--shadow)}
+    .btn.alt{background:white;color:var(--text)}
+    .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--text)}
+
+    main{min-height:60vh}
+
+    /* Motivational header + Dashboard */
+    .hero{
+      background:linear-gradient(180deg,#ffffff, #f7fbff);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      box-shadow:var(--shadow);
+      margin-bottom:12px;
+    }
+    .hero h1{margin:0 0 6px;font-size:20px}
+    .hero .quote{font-size:13px;color:var(--muted)}
+
+    .kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:12px}
+    .kpi{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;box-shadow:var(--shadow)}
+    .kpi .label{font-size:12px;color:var(--muted)}
+    .kpi .value{font-size:22px;font-weight:800;margin-top:2px}
+    .kpi.warn .value{color:var(--warn)}
+    .kpi.danger .value{color:var(--danger)}
+    .kpi.good .value{color:var(--good)}
+
+    /* Cards (Board) */
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+    .title{font-size:16px;font-weight:800}
+    .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .badge{font-size:11px;background:#f3f4f6;border:1px solid var(--border);padding:3px 8px;border-radius:999px}
+    .status{font-size:11px;padding:3px 8px;border-radius:999px;color:#fff}
+    .status.planned{background:var(--neutral)}
+    .status.progress{background:var(--warn)}
+    .status.completed{background:var(--good)}
+    .due{font-size:11px;padding:3px 8px;border-radius:999px;background:#fff;border:1px solid var(--border)}
+
+    .tags{display:flex;flex-wrap:wrap;gap:6px}
+    .tag{font-size:11px;padding:3px 8px;border-radius:999px;background:#eef2ff;border:1px solid #e0e7ff}
+    .card .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .card .actions .btn{padding:8px 10px;border-radius:10px;font-size:12px}
+
+    .empty{border:1px dashed var(--border);border-radius:var(--radius);padding:32px;text-align:center;background:#fafafa}
+
+    /* Table page */
+    #tableView{display:none}
+    table{width:100%;border-collapse:separate;border-spacing:0;background:white;border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+    thead th{position:sticky;top:0;background:#f9fafb;text-align:left;font-size:12px;color:#374151;padding:10px;border-bottom:1px solid var(--border);cursor:pointer}
+    tbody td{padding:10px;border-bottom:1px solid var(--border);font-size:13px}
+    tbody tr:hover{background:#f9fbff}
+    .pill{padding:2px 8px;border-radius:999px;border:1px solid var(--border);font-size:11px;background:#fff}
+
+    dialog{border:none;border-radius:18px;background:var(--panel);color:var(--text);padding:0;width:min(980px,96vw)}
+    dialog::backdrop{background:rgba(0,0,0,.4)}
+    .modal-header{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border)}
+    .modal-body{padding:14px 16px;max-height:70vh;overflow:auto}
+    .modal-footer{padding:14px 16px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px}
+
+    form .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    form .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+    form label{font-size:12px;color:var(--muted)}
+    form input, form select, form textarea{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:white;color:var(--text)}
+    form textarea{min-height:110px}
+
+    .footer{max-width:1400px;margin:18px auto;padding:8px 16px;color:var(--muted);font-size:12px}
+
+    .pill-filter{display:flex;gap:8px;flex-wrap:wrap}
+    .pill-filter button{font-size:12px;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:#fff;color:var(--text);cursor:pointer}
+    .pill-filter button.active{background:#dbeafe;border-color:#bfdbfe}
+
+    .kbd{border:1px solid var(--border);background:#f8fafc;border-radius:6px;padding:2px 6px;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,"Liberation Mono","Courier New", monospace;font-size:12px}
+    .tiny{font-size:11px;color:var(--muted)}
+
+    /* Toasts */
+    #toast{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;z-index:80}
+    .toast{background:#111827;color:white;padding:10px 12px;border-radius:10px;box-shadow:var(--shadow);max-width:320px}
+
+    /* Utility */
+    .hidden{display:none !important}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">A</div>
+      <div>
+        <div class="title"> PaperNest</div>
+        <div class="subtitle">Your clean, personal research paper dashboard</div>
+      </div>
+    </div>
+    <div class="nav">
+      <button class="tab active" id="tabBoard">Board</button>
+      <button class="tab" id="tabTable">Table</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <aside>
+      <div class="section">
+        <h3>Quick Actions</h3>
+        <div class="toolbar" style="margin:0 0 8px 0">
+          <button class="btn" id="addBtn">➕ Add paper</button>
+          <button class="btn alt" id="exportBtn">⤓ Export</button>
+          <button class="btn ghost" id="importBtn">⤒ Import</button>
+        </div>
+        <div class="tiny">Tip: Press <span class="kbd">A</span> to add, <span class="kbd">/</span> to search.</div>
+      </div>
+
+      <div class="section">
+        <h3>Search</h3>
+        <input type="search" id="q" placeholder="Search title, authors, tags…" />
+      </div>
+
+      <div class="section">
+        <h3>Category</h3>
+        <div class="pill-filter" id="catFilter">
+          <button data-cat="all" class="active">All</button>
+          <button data-cat="astro">Astrophysics & Cosmology</button>
+          <button data-cat="ai">AI & ML</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Status</h3>
+        <div class="pill-filter" id="statusFilter">
+          <button data-status="all" class="active">All</button>
+          <button data-status="planned">Planned</button>
+          <button data-status="progress">In Progress</button>
+          <button data-status="completed">Completed</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Tags</h3>
+        <div class="chips" id="tagChips"></div>
+      </div>
+
+      <div class="section">
+        <h3>Sort</h3>
+        <select id="sortBy">
+          <option value="updatedAt-desc">Recently updated</option>
+          <option value="createdAt-desc">Recently added</option>
+          <option value="title-asc">Title A→Z</option>
+          <option value="title-desc">Title Z→A</option>
+          <option value="year-desc">Year ↓</option>
+          <option value="year-asc">Year ↑</option>
+          <option value="priority-desc">Priority ↓</option>
+          <option value="dueDate-asc">Due date ↑</option>
+        </select>
+      </div>
+
+      <div class="section tiny">
+        Files are stored locally in your browser via IndexedDB. Use Export to backup. PDFs can be embedded and viewed.
+      </div>
+    </aside>
+
+    <main>
+      <!-- Hero + Analytics -->
+      <section class="hero" id="hero">
+        <h1>Read with purpose, ship with confidence.</h1>
+        <div class="quote" id="quote">“Small daily progress beats occasional intense sprints.”</div>
+        <div class="kpi-grid" id="kpis">
+          <div class="kpi"><div class="label">Total Papers</div><div class="value" id="kpi_total">0</div></div>
+          <div class="kpi"><div class="label">Planned</div><div class="value" id="kpi_planned">0</div></div>
+          <div class="kpi"><div class="label">In Progress</div><div class="value" id="kpi_progress">0</div></div>
+          <div class="kpi good"><div class="label">Completed (7d)</div><div class="value" id="kpi_completed7">0</div></div>
+          <div class="kpi warn"><div class="label">Due Today</div><div class="value" id="kpi_dueToday">0</div></div>
+          <div class="kpi danger"><div class="label">Overdue</div><div class="value" id="kpi_overdue">0</div></div>
+        </div>
+      </section>
+
+      <!-- Top toolbar for Board -->
+      <div class="toolbar" id="boardToolbar">
+        <input type="search" id="qTop" placeholder="Search… (focus with /)" />
+        <button class="btn" id="addBtnTop">➕ Add paper</button>
+        <button class="btn alt" id="exportBtnTop">⤓ Export</button>
+      </div>
+
+      <!-- Board view -->
+      <div id="cards" class="grid"></div>
+      <div id="empty" class="empty" style="display:none">
+        <h3>No papers yet</h3>
+        <p>Add your first paper. Paste a link, attach a PDF, then jot your summary and notes.</p>
+        <button class="btn" id="addBtnEmpty">Add a paper</button>
+      </div>
+
+      <!-- Table view -->
+      <section id="tableView">
+        <div class="toolbar" style="margin-top:6px">
+          <input type="search" id="qTable" placeholder="Filter table…" />
+          <button class="btn alt" id="exportBtnTable">⤓ Export</button>
+        </div>
+        <div style="overflow:auto">
+          <table id="table">
+            <thead>
+              <tr>
+                <th data-sort="title">Title</th>
+                <th data-sort="category">Category</th>
+                <th data-sort="status">Status</th>
+                <th data-sort="year">Year</th>
+                <th data-sort="priority">Priority</th>
+                <th>Tags</th>
+                <th data-sort="dueDate">Due</th>
+                <th data-sort="updatedAt">Updated</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="footer">
+      Built with ❤️ by Agastya. Organize, track, and conquer your reading goals.
+  </div>
+
+  <!-- Add/Edit Modal -->
+  <dialog id="paperModal">
+    <form id="paperForm" method="dialog">
+      <div class="modal-header">
+        <div style="font-weight:800">✍️ <span id="modalTitle">Add Paper</span></div>
+        <button type="button" class="btn ghost" id="closeModal">Close</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="paperId" />
+        <div class="row">
+          <div>
+            <label>Category</label>
+            <select id="category" required>
+              <option value="astro">Astrophysics & Cosmology</option>
+              <option value="ai">AI & ML</option>
+            </select>
+          </div>
+          <div>
+            <label>Status</label>
+            <select id="status" required>
+              <option value="planned">Planned</option>
+              <option value="progress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Title</label>
+            <input id="title" required placeholder="Paper title" />
+          </div>
+          <div>
+            <label>Authors</label>
+            <input id="authors" placeholder="Author1, Author2, …" />
+          </div>
+        </div>
+        <div class="row3">
+          <div>
+            <label>Year</label>
+            <input id="year" type="number" min="1900" max="2100" placeholder="2025" />
+          </div>
+          <div>
+            <label>Tags (comma‑separated)</label>
+            <input id="tags" placeholder="CMB, diffusion, delensing" />
+          </div>
+          <div>
+            <label>Link (URL)</label>
+            <input id="link" type="url" placeholder="https://arxiv.org/abs/..." />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Attach PDF (optional)</label>
+            <input id="pdf" type="file" accept="application/pdf" />
+            <div class="tiny" id="pdfHint"></div>
+          </div>
+          <div>
+            <label>PDF filename</label>
+            <input id="pdfName" placeholder="auto from upload" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Summary — what I understood</label>
+            <textarea id="summary" placeholder="Key ideas, results, why it matters…"></textarea>
+          </div>
+          <div>
+            <label>Notes</label>
+            <textarea id="notes" placeholder="Derivations, to‑do, critiques, follow‑ups…"></textarea>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>BibTeX / Reference (optional)</label>
+            <textarea id="bibtex" placeholder="@article{...}"></textarea>
+          </div>
+          <div>
+            <label>Priority (1–5)</label>
+            <input id="priority" type="number" min="1" max="5" placeholder="3" />
+            <div class="tiny">Higher = sooner in queue.</div>
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label>Due Date & Time</label>
+            <input id="dueDate" type="datetime-local" />
+            <div class="tiny">Use “Remind Me Later” from cards for quick scheduling.</div>
+          </div>
+          <div>
+            <label>Estimate (minutes)</label>
+            <input id="estimateMin" type="number" min="10" max="600" placeholder="45" />
+            <div class="tiny">Optional reading time estimate.</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn" id="saveBtn">Save</button>
+        <button type="button" class="btn alt" id="saveAndAddBtn">Save & Add Another</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Import/Export Modal -->
+  <dialog id="ioModal">
+    <div class="modal-header">
+      <div style="font-weight:800">↕ Import / Export</div>
+      <button class="btn ghost" id="closeIOModal">Close</button>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div>
+          <h3 style="margin:6px 0 8px">Export</h3>
+          <label><input type="checkbox" id="includePDFs" /> Include PDFs (large file)</label>
+          <div style="margin-top:8px">
+            <button class="btn" id="doExport">Download Export JSON</button>
+          </div>
+          <div class="tiny" style="margin-top:6px">Creates a portable JSON you can import later. PDFs are base64‑embedded if included.</div>
+        </div>
+        <div>
+          <h3 style="margin:6px 0 8px">Import</h3>
+          <input type="file" id="importFile" accept="application/json" />
+          <div style="margin-top:8px">
+            <label><input type="radio" name="mergeMode" value="merge" checked /> Merge into existing</label>
+            <label style="margin-left:12px"><input type="radio" name="mergeMode" value="replace" /> Replace everything</label>
+          </div>
+          <div style="margin-top:8px">
+            <button class="btn alt" id="doImport">Import JSON</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- PDF Viewer Modal (Part 2 will replace iframe with PDF.js canvas) -->
+  <dialog id="pdfModal">
+    <div class="modal-header">
+      <div style="font-weight:800">📄 PDF Viewer</div>
+      <button class="btn ghost" id="closePdf">Close</button>
+    </div>
+    <div class="modal-body">
+      <div class="toolbar" id="pdfToolbar">
+        <input id="pdfSearch" placeholder="(Part 2) Search in PDF…" disabled>
+        <button class="btn alt" id="pdfPrev" disabled>Prev</button>
+        <button class="btn alt" id="pdfNext" disabled>Next</button>
+      </div>
+      <iframe id="pdfFrame" style="width:100%;height:70vh;border:1px solid var(--border);border-radius:12px;background:#ffffff"></iframe>
+      <div class="tiny">PDF text search & annotation features coming soon.</div>
+    </div>
+  </dialog>
+
+  <div id="toast"></div>
+
+  <script>
+  // ---------------- IndexedDB Wrapper (v2) ----------------
+  const DB_NAME = 'paperHubDB_v2';
+  const STORE = 'papers';
+  let db;
+
+  function openDB(){
+    return new Promise((resolve, reject)=>{
+      const req = indexedDB.open(DB_NAME,2);
+      req.onupgradeneeded = (e)=>{
+        const db = e.target.result;
+        let os;
+        if(!db.objectStoreNames.contains(STORE)){
+          os = db.createObjectStore(STORE,{keyPath:'id', autoIncrement:true});
+        }else{
+          os = req.transaction.objectStore(STORE);
+        }
+        // Ensure indexes exist
+        const ensure = (name,key,opts)=>{ if(!os.indexNames.contains(name)) os.createIndex(name,key,opts||{unique:false}); };
+        ensure('category','category');
+        ensure('status','status');
+        ensure('title','title');
+        ensure('updatedAt','updatedAt');
+        ensure('createdAt','createdAt');
+        ensure('dueDate','dueDate');
+        ensure('priority','priority');
+      };
+      req.onsuccess = ()=>{db=req.result; resolve(db)};
+      req.onerror = (e)=>reject(e.target.error);
+    })
+  }
+
+  function tx(store, mode='readonly'){
+    return db.transaction([STORE], mode).objectStore(STORE);
+  }
+
+  function addPaper(p){
+    return new Promise((resolve,reject)=>{
+      const now = Date.now();
+      p.createdAt = p.createdAt || now;
+      p.updatedAt = now;
+      const req = tx(STORE,'readwrite').add(p);
+      req.onsuccess = ()=>resolve(req.result);
+      req.onerror = (e)=>reject(e.target.error);
+    })
+  }
+
+  function updatePaper(id, patch){
+    return new Promise(async (resolve,reject)=>{
+      const store = tx(STORE,'readwrite');
+      const getReq = store.get(id);
+      getReq.onsuccess = async ()=>{
+        let obj = getReq.result; if(!obj){reject('Not found');return}
+        Object.assign(obj, patch); obj.updatedAt = Date.now();
+        const putReq = store.put(obj);
+        putReq.onsuccess = ()=>resolve(obj);
+        putReq.onerror = (e)=>reject(e.target.error);
+      }
+      getReq.onerror = (e)=>reject(e.target.error);
+    })
+  }
+
+  function deletePaper(id){
+    return new Promise((resolve,reject)=>{
+      const req = tx(STORE,'readwrite').delete(id);
+      req.onsuccess = ()=>resolve();
+      req.onerror = (e)=>reject(e.target.error);
+    })
+  }
+
+  function getAll(){
+    return new Promise((resolve,reject)=>{
+      const req = tx(STORE).getAll();
+      req.onsuccess = ()=>resolve(req.result||[]);
+      req.onerror = (e)=>reject(e.target.error);
+    })
+  }
+
+  // ---------------- Utilities ----------------
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => Array.from(document.querySelectorAll(sel));
+  const el = (tag, props={}) => Object.assign(document.createElement(tag), props);
+
+  function parseTags(s){
+    if(!s) return [];
+    return s.split(',').map(t=>t.trim()).filter(Boolean).map(t=>t.toLowerCase());
+  }
+
+  function bytes(n){
+    if(!n && n!==0) return '';
+    const u=['B','KB','MB','GB'];
+    let i=0; while(n>1024 && i<u.length-1){n/=1024;i++}
+    return n.toFixed( (i?1:0) )+' '+u[i];
+  }
+
+  function statusClass(s){
+    if(s==='completed') return 'completed';
+    if(s==='progress') return 'progress';
+    return 'planned';
+  }
+
+  function niceCat(c){
+    return c==='ai' ? 'AI & ML' : 'Astrophysics & Cosmology';
+  }
+
+  function fmtDate(ts){
+    if(!ts) return '';
+    const d = new Date(ts);
+    const pad = n=>String(n).padStart(2,'0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function toLocalDTValue(ts){
+    if(!ts) return '';
+    const d = new Date(ts);
+    const pad = n=>String(n).padStart(2,'0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  function fromLocalDTInput(val){
+    if(!val) return null;
+    // Treat as local time
+    return new Date(val).getTime();
+  }
+
+  function startOfToday(){
+    const d = new Date(); d.setHours(0,0,0,0); return d.getTime();
+  }
+  function endOfToday(){
+    const d = new Date(); d.setHours(23,59,59,999); return d.getTime();
+  }
+
+  // ---------------- State & Rendering ----------------
+  let STATE = { q:'', category:'all', status:'all', tags:new Set(), sort:'updatedAt-desc', items:[] };
+
+  function computeTagSet(items){
+    const set = new Set();
+    items.forEach(p=> (p.tags||[]).forEach(t=> set.add(t)) );
+    return Array.from(set).sort();
+  }
+
+  function applyFilters(){
+    const q = STATE.q.toLowerCase().trim();
+    const hasQ = q.length>0;
+    let list = STATE.items.slice();
+    if(STATE.category!=='all') list = list.filter(p=>p.category===STATE.category);
+    if(STATE.status!=='all') list = list.filter(p=>p.status===STATE.status);
+    if(STATE.tags.size>0) list = list.filter(p=> (p.tags||[]).some(t=> STATE.tags.has(t)) );
+    if(hasQ){
+      list = list.filter(p=>{
+        const fields = [p.title, p.authors, (p.tags||[]).join(' ')].join(' ').toLowerCase();
+        return fields.includes(q);
+      })
+    }
+    // sort
+    const [field, dir] = STATE.sort.split('-');
+    list.sort((a,b)=>{
+      let va=a[field]??'', vb=b[field]??'';
+      if(field.includes('At')||field==='year'||field==='priority'||field==='dueDate'){va=+va||0; vb=+vb||0}
+      if(va<vb) return dir==='asc'?-1:1;
+      if(va>vb) return dir==='asc'?1:-1;
+      return 0;
+    })
+    renderBoard(list);
+    renderTable(list);
+    renderKPIs(STATE.items);
+  }
+
+  function renderKPIs(items){
+    const now = Date.now();
+    const total = items.length;
+    const planned = items.filter(p=>p.status==='planned').length;
+    const progress = items.filter(p=>p.status==='progress').length;
+    const completed7 = items.filter(p=>p.status==='completed' && (p.updatedAt||0) >= (now-7*24*3600*1000)).length;
+    const dueToday = items.filter(p=> p.status!=='completed' && p.dueDate && p.dueDate>=startOfToday() && p.dueDate<=endOfToday() ).length;
+    const overdue = items.filter(p=> p.status!=='completed' && p.dueDate && p.dueDate<startOfToday()).length;
+    $('#kpi_total').textContent = total;
+    $('#kpi_planned').textContent = planned;
+    $('#kpi_progress').textContent = progress;
+    $('#kpi_completed7').textContent = completed7;
+    $('#kpi_dueToday').textContent = dueToday;
+    $('#kpi_overdue').textContent = overdue;
+  }
+
+  function renderBoard(list){
+    const cards = $('#cards');
+    cards.innerHTML = '';
+    $('#empty').style.display = list.length? 'none':'block';
+    if(!list.length) return;
+    for(const p of list){
+      const c = el('div',{className:'card'});
+      const title = el('div',{className:'title', textContent:p.title || '(untitled)'});
+      const meta = el('div',{className:'meta'});
+      const cat = el('span',{className:'badge', textContent: niceCat(p.category)});
+      const year = p.year? el('span',{className:'badge', textContent: String(p.year)}): null;
+      const stat = el('span',{className:'status '+statusClass(p.status), textContent: p.status==='progress'?'In Progress': p.status==='completed'?'Completed':'Planned'});
+      const due = p.dueDate? el('span',{className:'due', textContent:'Due '+fmtDate(p.dueDate)}) : null;
+      meta.append(cat); if(year) meta.append(year); meta.append(stat); if(due) meta.append(due);
+
+      const tags = el('div',{className:'tags'});
+      (p.tags||[]).forEach(t=> tags.append(el('span',{className:'tag', textContent:t})));
+
+      const actions = el('div',{className:'actions'});
+      if(p.link){ actions.append(button('Open Link', ()=> window.open(p.link,'_blank'))); }
+      if(p.pdfBlob){ actions.append(button('View PDF', ()=> viewPDF(p))); }
+      actions.append(button('Edit', ()=> editPaper(p)));
+      actions.append(button('Delete', async ()=>{ if(confirm('Delete this paper?')){ await deletePaper(p.id); await refresh(); }}));
+      actions.append(button('Remind Me Later', async ()=>{ await quickRemind(p); }));
+      if(p.status!=='completed'){
+        actions.append(button('Mark Completed', async ()=>{ await updatePaper(p.id,{status:'completed'}); await refresh(); }, 'btn'))
+      }
+
+      const summary = el('div',{className:'tiny', innerHTML: p.summary? esc(p.summary).slice(0,280)+(p.summary.length>280?'…':'') : '<em>No summary yet</em>'});
+
+      c.append(title, meta, tags, actions, summary);
+      // Overdue accent
+      if(p.status!=='completed' && p.dueDate && p.dueDate<startOfToday()){
+        c.style.boxShadow = '0 0 0 2px rgba(220,38,38,.25), '+getComputedStyle(document.body).getPropertyValue('--shadow');
+      }
+      cards.append(c);
+    }
+  }
+
+  function renderTable(list){
+    const tb = $('#tableBody');
+    tb.innerHTML = '';
+    const q = $('#qTable').value?.toLowerCase().trim() || '';
+    const filtered = q? list.filter(p=> (p.title+" "+(p.authors||'')+" "+(p.tags||[]).join(' ')).toLowerCase().includes(q)) : list;
+
+    for(const p of filtered){
+      const tr = el('tr');
+      const tTags = (p.tags||[]).map(t=>`<span class="pill">${esc(t)}</span>`).join(' ');
+      tr.innerHTML = `
+        <td>${esc(p.title||'')}</td>
+        <td>${esc(niceCat(p.category))}</td>
+        <td><span class="pill">${p.status==='progress'?'In Progress': p.status==='completed'?'Completed':'Planned'}</span></td>
+        <td>${p.year? esc(String(p.year)) : ''}</td>
+        <td>${p.priority??''}</td>
+        <td>${tTags}</td>
+        <td>${p.dueDate? esc(fmtDate(p.dueDate)) : ''}</td>
+        <td>${p.updatedAt? esc(fmtDate(p.updatedAt)) : ''}</td>
+        <td>
+          <button class="btn alt" data-act="view" data-id="${p.id}">View</button>
+          <button class="btn alt" data-act="edit" data-id="${p.id}">Edit</button>
+          ${p.pdfBlob? `<button class="btn" data-act="pdf" data-id="${p.id}">PDF</button>`:''}
+        </td>`;
+      tb.append(tr);
+    }
+  }
+
+  function button(label, onClick, cls='btn alt'){
+    const b = el('button',{className:cls, textContent:label});
+    b.addEventListener('click', onClick); return b;
+  }
+
+  function esc(s){
+    return (s||'').replace(/[&<>]/g, c=> ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]) );
+  }
+
+  // ---------------- Add/Edit Flow ----------------
+  const paperModal = $('#paperModal');
+  const ioModal = $('#ioModal');
+  const pdfModal = $('#pdfModal');
+
+  function clearForm(){
+    $('#paperId').value='';
+    $('#category').value='astro';
+    $('#status').value='planned';
+    $('#title').value='';
+    $('#authors').value='';
+    $('#year').value='';
+    $('#tags').value='';
+    $('#link').value='';
+    $('#pdf').value='';
+    $('#pdfHint').textContent='';
+    $('#pdfName').value='';
+    $('#summary').value='';
+    $('#notes').value='';
+    $('#bibtex').value='';
+    $('#priority').value='';
+    $('#dueDate').value='';
+    $('#estimateMin').value='';
+  }
+
+  function populateForm(p){
+    $('#paperId').value=p.id;
+    $('#category').value=p.category||'astro';
+    $('#status').value=p.status||'planned';
+    $('#title').value=p.title||'';
+    $('#authors').value=p.authors||'';
+    $('#year').value=p.year||'';
+    $('#tags').value=(p.tags||[]).join(', ');
+    $('#link').value=p.link||'';
+    $('#pdf').value='';
+    $('#pdfHint').textContent=p.pdfBlob? `Stored PDF • ${p.pdfName||'untitled'} • ${bytes(p.pdfBlob.size)}`: 'No PDF attached';
+    $('#pdfName').value=p.pdfName||'';
+    $('#summary').value=p.summary||'';
+    $('#notes').value=p.notes||'';
+    $('#bibtex').value=p.bibtex||'';
+    $('#priority').value=p.priority||'';
+    $('#dueDate').value = toLocalDTValue(p.dueDate) || '';
+    $('#estimateMin').value = p.estimateMin || '';
+  }
+
+  async function editPaper(p){
+    $('#modalTitle').textContent = 'Edit Paper';
+    populateForm(p);
+    paperModal.showModal();
+  }
+
+  async function viewPDF(p){
+    if(!p.pdfBlob){ alert('No PDF attached'); return; }
+    const url = URL.createObjectURL(p.pdfBlob);
+    $('#pdfFrame').src = url;
+    pdfModal.showModal();
+    const cleanup = ()=>{ URL.revokeObjectURL(url); $('#pdfFrame').src='about:blank'; };
+    $('#closePdf').onclick = ()=>{ cleanup(); pdfModal.close(); };
+    pdfModal.addEventListener('close', cleanup, {once:true});
+  }
+
+  async function onSubmit(saveAndAdd=false){
+    const id = Number($('#paperId').value||'');
+    const paper = {
+      category: $('#category').value,
+      status: $('#status').value,
+      title: $('#title').value.trim(),
+      authors: $('#authors').value.trim(),
+      year: Number($('#year').value)||null,
+      tags: parseTags($('#tags').value),
+      link: $('#link').value.trim()||null,
+      pdfName: $('#pdfName').value.trim()||null,
+      summary: $('#summary').value.trim(),
+      notes: $('#notes').value.trim(),
+      bibtex: $('#bibtex').value.trim(),
+      priority: Number($('#priority').value)||null,
+      dueDate: fromLocalDTInput($('#dueDate').value),
+      estimateMin: Number($('#estimateMin').value)||null
+    };
+
+    const file = $('#pdf').files && $('#pdf').files[0];
+    if(file){ paper.pdfBlob = file; paper.pdfName = paper.pdfName || file.name; }
+
+    if(!paper.title){ alert('Title is required'); return; }
+
+    if(id){
+      // If no new file, keep old blob
+      const prev = STATE.items.find(x=>x.id===id);
+      if(prev && !paper.pdfBlob){ paper.pdfBlob = prev.pdfBlob; paper.pdfName = prev.pdfName; }
+      await updatePaper(id, paper);
+    }else{
+      await addPaper(paper);
+    }
+
+    await refresh();
+
+    if(saveAndAdd){ clearForm(); $('#modalTitle').textContent='Add Paper'; $('#title').focus(); }
+    else { paperModal.close(); }
+  }
+
+  // ---------------- Import / Export ----------------
+  async function exportJSON(includePDFs){
+    const items = await getAll();
+    const out = [];
+    for(const p of items){
+      const {pdfBlob, ...rest} = p;
+      const obj = {...rest};
+      if(includePDFs && pdfBlob){
+        obj.pdfBase64 = await blobToBase64(pdfBlob);
+      }
+      out.push(obj);
+    }
+    const payload = {version:1, exportedAt:Date.now(), items: out};
+    const blob = new Blob([JSON.stringify(payload,null,2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    download(url, `paperhub_export_${new Date().toISOString().slice(0,10)}${includePDFs?'_with_pdfs':''}.json`);
+    URL.revokeObjectURL(url);
+  }
+
+  function blobToBase64(blob){
+    return new Promise((resolve,reject)=>{
+      const r = new FileReader();
+      r.onload = ()=>resolve(String(r.result));
+      r.onerror = reject; r.readAsDataURL(blob);
+    })
+  }
+
+  async function importJSON(file, mode){
+    const text = await file.text();
+    let data; try{ data = JSON.parse(text); }catch(e){ alert('Invalid JSON'); return; }
+    if(!data || !Array.isArray(data.items)){ alert('Invalid export format'); return; }
+    if(mode==='replace'){
+      // nuke store
+      await new Promise((resolve,reject)=>{
+        const t = db.transaction([STORE],'readwrite');
+        const store = t.objectStore(STORE);
+        const req = store.clear();
+        req.onsuccess=()=>resolve();
+        req.onerror=(e)=>reject(e.target.error);
+      })
+    }
+    for(const it of data.items){
+      const copy = {...it};
+      let pdfBlob=null;
+      if(copy.pdfBase64){
+        try{ pdfBlob = dataURLToBlob(copy.pdfBase64); }catch{ pdfBlob=null }
+        delete copy.pdfBase64;
+      }
+      copy.tags = parseTags((copy.tags||[]).join(','));
+      if(pdfBlob) copy.pdfBlob = pdfBlob;
+      delete copy.id; // let it auto-assign
+      await addPaper(copy);
+    }
+    await refresh();
+  }
+
+  function dataURLToBlob(dataURL){
+    const [meta, b64] = dataURL.split(',');
+    const mime = (meta.match(/data:(.*?);base64/)||[])[1]||'application/octet-stream';
+    const bin = atob(b64); const len = bin.length; const u8 = new Uint8Array(len);
+    for(let i=0;i<len;i++) u8[i]=bin.charCodeAt(i);
+    return new Blob([u8],{type:mime});
+  }
+
+  function download(url, filename){
+    const a = el('a',{href:url,download:filename});
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+
+  // ---------------- Reminders & Smart Priority ----------------
+  const NOTIFY_KEY = 'paperhub_last_notified';
+
+  function toast(msg){
+    const wrap = $('#toast');
+    const t = el('div',{className:'toast', textContent: msg});
+    wrap.append(t);
+    setTimeout(()=>{ t.remove(); }, 5000);
+  }
+
+  async function quickRemind(p){
+    // schedule for tomorrow 9:00 local (or next weekday if overdue)
+    const d = new Date();
+    d.setDate(d.getDate()+1); d.setHours(9,0,0,0);
+    await updatePaper(p.id, { dueDate: d.getTime(), priority: p.priority || 3 });
+    toast(`Reminder set for “${p.title}” · ${fmtDate(d.getTime())}`);
+    await refresh();
+    scheduleNotificationCheck();
+  }
+
+  function canNotify(){
+    return 'Notification' in window;
+  }
+
+  async function ensureNotifyPermission(){
+    if(!canNotify()) return false;
+    if(Notification.permission === 'granted') return true;
+    if(Notification.permission !== 'denied'){
+      const res = await Notification.requestPermission();
+      return res === 'granted';
+    }
+    return false;
+  }
+
+  function checkRemindersAndNotify(){
+    const now = Date.now();
+    const soon = now + 60*60*1000; // next hour
+    const last = JSON.parse(localStorage.getItem(NOTIFY_KEY)||'{}');
+
+    const upcoming = STATE.items.filter(p=> p.status!=='completed' && p.dueDate && p.dueDate<=soon);
+    upcoming.forEach(p=>{
+      const key = String(p.id);
+      if(last[key] && now - last[key] < 6*60*60*1000) return; // don't spam within 6h
+      // notify subtle
+      try{ new Notification('Reading reminder', { body: `${p.title} — due ${fmtDate(p.dueDate)}` }); }
+      catch(_){ toast(`Reminder: ${p.title} — due ${fmtDate(p.dueDate)}`); }
+      last[key] = now;
+    });
+    localStorage.setItem(NOTIFY_KEY, JSON.stringify(last));
+  }
+
+  let notifyInterval;
+  function scheduleNotificationCheck(){
+    if(notifyInterval) clearInterval(notifyInterval);
+    notifyInterval = setInterval(checkRemindersAndNotify, 60*60*1000); // hourly
+  }
+
+  // ---------------- Refresh ----------------
+  async function refresh(){
+    STATE.items = await getAll();
+    // build tag chips
+    const tagWrap = $('#tagChips'); tagWrap.innerHTML='';
+    const tags = computeTagSet(STATE.items);
+    for(const t of tags){
+      const chip = el('div',{className:'chip'+(STATE.tags.has(t)?' active':''), textContent:t});
+      chip.addEventListener('click',()=>{ if(STATE.tags.has(t)) STATE.tags.delete(t); else STATE.tags.add(t); chip.classList.toggle('active'); applyFilters(); });
+      tagWrap.append(chip);
+    }
+    applyFilters();
+  }
+
+  // ---------------- Events ----------------
+  (async function init(){
+    await openDB();
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e)=>{
+      if(e.key==='/'){ e.preventDefault(); $('#qTop').focus(); }
+      if(e.key.toLowerCase()==='a'){ if(!paperModal.open){ e.preventDefault(); addNew(); } }
+    });
+
+    // Tabs
+    const switchTab = (name)=>{
+      const isTable = name==='table';
+      $('#tabBoard').classList.toggle('active', !isTable);
+      $('#tabTable').classList.toggle('active', isTable);
+      $('#cards').style.display = isTable? 'none':'grid';
+      $('#empty').style.display = isTable? 'none':($('#cards').children.length? 'none':'block');
+      $('#boardToolbar').style.display = isTable? 'none':'flex';
+      $('#tableView').style.display = isTable? 'block':'none';
+    };
+    $('#tabBoard').onclick = ()=> switchTab('board');
+    $('#tabTable').onclick = ()=> switchTab('table');
+
+    // Search sync
+    const onSearch = (e)=>{ STATE.q = e.target.value; $('#q').value=STATE.q; $('#qTop').value=STATE.q; applyFilters(); };
+    $('#q').addEventListener('input', onSearch);
+    $('#qTop').addEventListener('input', onSearch);
+    $('#qTable').addEventListener('input', ()=> applyFilters());
+
+    // Category filter
+    $$('#catFilter button').forEach(b=> b.addEventListener('click', ()=>{
+      $$('#catFilter button').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      STATE.category = b.dataset.cat; applyFilters();
+    }));
+
+    // Status filter
+    $$('#statusFilter button').forEach(b=> b.addEventListener('click', ()=>{
+      $$('#statusFilter button').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      STATE.status = b.dataset.status; applyFilters();
+    }));
+
+    // Sort
+    $('#sortBy').addEventListener('change', (e)=>{ STATE.sort = e.target.value; applyFilters(); });
+
+    // Add buttons
+    $('#addBtn').onclick = addNew; $('#addBtnTop').onclick = addNew; $('#addBtnEmpty').onclick = addNew;
+    function addNew(){ clearForm(); $('#modalTitle').textContent='Add Paper'; paperModal.showModal(); }
+
+    // Close modal
+    $('#closeModal').onclick = ()=> paperModal.close();
+
+    // Save
+    $('#paperForm').addEventListener('submit', async (e)=>{ e.preventDefault(); await onSubmit(false); });
+    $('#saveAndAddBtn').addEventListener('click', async (e)=>{ e.preventDefault(); await onSubmit(true); });
+
+    // PDF input hint
+    $('#pdf').addEventListener('change', (e)=>{
+      const f = e.target.files && e.target.files[0];
+      $('#pdfHint').textContent = f? `${f.name} • ${bytes(f.size)}` : '';
+      if(f && !$('#pdfName').value) $('#pdfName').value = f.name;
+    });
+
+    // Export / Import
+    const openIO = ()=> ioModal.showModal();
+    $('#exportBtn').onclick = openIO; $('#exportBtnTop').onclick = openIO; $('#importBtn').onclick = openIO; $('#exportBtnTable').onclick = openIO;
+    $('#closeIOModal').onclick = ()=> ioModal.close();
+
+    $('#doExport').onclick = ()=> exportJSON( $('#includePDFs').checked );
+    $('#doImport').onclick = async ()=>{
+      const file = $('#importFile').files && $('#importFile').files[0];
+      if(!file){ alert('Choose a JSON file'); return; }
+      const mode = document.querySelector('input[name="mergeMode"]:checked').value;
+      await importJSON(file, mode); ioModal.close();
+    };
+
+    // Table actions (event delegation)
+    $('#tableBody').addEventListener('click', (e)=>{
+      const b = e.target.closest('button'); if(!b) return;
+      const id = Number(b.dataset.id); const act = b.dataset.act;
+      const p = STATE.items.find(x=>x.id===id); if(!p) return;
+      if(act==='view') editPaper(p);
+      if(act==='edit') editPaper(p);
+      if(act==='pdf') viewPDF(p);
+    });
+
+    await refresh();
+
+    // On first run, show samples
+    if(!STATE.items.length){
+      await addPaper({
+        category:'astro', status:'planned', title:'Score‑based delensing for CMB B‑modes', authors:'Agastya et al.', year:new Date().getFullYear(), tags:['cmb','diffusion','delensing'], link:'https://arxiv.org', summary:'Placeholder — add your own takeaways.', notes:'Try VE‑SDE prior; compare with template delensing.', priority:3, estimateMin:45
+      });
+      await addPaper({
+        category:'ai', status:'progress', title:'Diffusion Models in Scientific Imaging', authors:'Ho, Song, et al.', year:2021, tags:['diffusion','score-matching'], link:'https://arxiv.org', summary:'High‑level survey. Track equations and training tricks.', notes:'Relate SDE formalism to inverse problems.', priority:2, estimateMin:35
+      });
+      await refresh();
+    }
+
+    // Notifications
+    const granted = await ensureNotifyPermission();
+    if(!granted){ toast('Enable notifications later for due reminders (browser prompt was dismissed).'); }
+    scheduleNotificationCheck();
+    checkRemindersAndNotify(); // initial pass
+
+    // Quote rotate (tiny motivation)
+    const quotes = [
+      '“Small daily progress beats occasional intense sprints.”',
+      '“Read, connect, synthesize — then build.”',
+      '“Clarity comes from shipping.”',
+      '“Prioritize ruthlessly. Execute calmly.”'
+    ];
+    let qi = 0; setInterval(()=>{ qi=(qi+1)%quotes.length; $('#quote').textContent = quotes[qi]; }, 9000);
+  })();
+  </script>
+</body>
+</html>
