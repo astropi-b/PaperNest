@@ -769,13 +769,76 @@
   async function viewPDF(p){
     if(!p.pdfBlob){ alert('No PDF attached'); return; }
     const url = URL.createObjectURL(p.pdfBlob);
-    $('#pdfFrame').src = url;
+    const viewer = 'https://mozilla.github.io/pdf.js/web/viewer.html?file=' + encodeURIComponent(url);
+    $('#pdfFrame').src = viewer;
     pdfModal.showModal();
     // auto-enter full window mode on open
     pdfModal.classList.add('fullwindow');
     const cleanup = ()=>{ URL.revokeObjectURL(url); $('#pdfFrame').src='about:blank'; pdfModal.classList.remove('fullwindow'); };
     $('#closePdf').onclick = ()=>{ cleanup(); pdfModal.close(); };
     pdfModal.addEventListener('close', cleanup, {once:true});
+  }
+
+  async function fetchMetadataFromLink(link){
+    try{
+      let meta = {};
+      const doiMatch = link.match(/doi\.org\/(.+)/);
+      if(doiMatch){
+        const doi = doiMatch[1];
+        const res = await fetch(`https://api.crossref.org/works/${encodeURIComponent(doi)}`);
+        if(res.ok){
+          const data = await res.json();
+          const msg = data.message;
+          meta.title = msg.title && msg.title[0];
+          meta.authors = msg.author ? msg.author.map(a=>`${a.given||''} ${a.family||''}`.trim()).join(', ') : '';
+          const dp = (msg['published-print']||msg['published-online']||{}).['date-parts'];
+          if(dp && dp[0]) meta.year = dp[0][0];
+          meta.tags = msg.subject || [];
+          try{
+            const bib = await fetch(`https://doi.org/${encodeURIComponent(doi)}`, {headers:{Accept:'application/x-bibtex'}});
+            if(bib.ok) meta.bibtex = await bib.text();
+          }catch(err){}
+        }
+      } else {
+        const ax = link.match(/arxiv\.org\/(?:abs|pdf)\/([\w\.\-]+)/);
+        if(ax){
+          const id = ax[1].replace('.pdf','');
+          const res = await fetch(`https://export.arxiv.org/api/query?id_list=${id}`);
+          if(res.ok){
+            const xml = await res.text();
+            const feed = new DOMParser().parseFromString(xml,'application/xml');
+            const entry = feed.querySelector('entry');
+            if(entry){
+              meta.title = entry.querySelector('title')?.textContent.trim();
+              meta.authors = Array.from(entry.querySelectorAll('author > name')).map(n=>n.textContent).join(', ');
+              const pub = entry.querySelector('published')?.textContent;
+              if(pub) meta.year = new Date(pub).getFullYear();
+              meta.tags = Array.from(entry.querySelectorAll('category')).map(c=>c.getAttribute('term'));
+              try{
+                const bib = await fetch(`https://arxiv.org/bibtex/${id}`);
+                if(bib.ok) meta.bibtex = await bib.text();
+              }catch(err){}
+            }
+          }
+        }
+      }
+      return meta;
+    }catch(err){
+      console.error('Metadata fetch failed', err);
+      toast('Could not fetch metadata');
+      return null;
+    }
+  }
+
+  async function autoFillFromLink(link){
+    if(!link) return;
+    const meta = await fetchMetadataFromLink(link);
+    if(!meta) return;
+    if(meta.title && !$('#title').value) $('#title').value = meta.title;
+    if(meta.authors && !$('#authors').value) $('#authors').value = meta.authors;
+    if(meta.year && !$('#year').value) $('#year').value = meta.year;
+    if(meta.tags && meta.tags.length && !$('#tags').value) $('#tags').value = meta.tags.join(', ');
+    if(meta.bibtex && !$('#bibtex').value) $('#bibtex').value = meta.bibtex;
   }
 
   async function onSubmit(saveAndAdd=false){
@@ -1019,6 +1082,26 @@
       const f = e.target.files && e.target.files[0];
       $('#pdfHint').textContent = f? `${f.name} • ${bytes(f.size)}` : '';
       if(f && !$('#pdfName').value) $('#pdfName').value = f.name;
+    });
+
+    // Auto-fill metadata when a link is provided
+    $('#link').addEventListener('change', async (e)=>{
+      await autoFillFromLink(e.target.value.trim());
+    });
+
+    // Quick Add from clipboard (Ctrl/Cmd+Shift+V)
+    document.addEventListener('keydown', async (e)=>{
+      if((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase()==='v'){
+        e.preventDefault();
+        try{
+          const text = await navigator.clipboard.readText();
+          if(text){
+            addNew();
+            $('#link').value = text.trim();
+            await autoFillFromLink(text.trim());
+          }
+        }catch(err){ toast('Clipboard read failed'); }
+      }
     });
 
     // Export / Import
