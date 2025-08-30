@@ -13,6 +13,9 @@
 - **Smart Reminders:** Set due dates and get notifications—never miss a reading goal.
 - **Offline-First:** All data is stored in your browser (IndexedDB); your papers never leave your device.
 - **Import/Export:** Easily back up or migrate your library as JSON, with or without PDFs.
+- **Smart Capture:** Paste an arXiv or DOI link to auto-fill paper details.
+- **Quick Add:** Press <kbd>Ctrl/Cmd+Shift+V</kbd> to add a paper straight from your clipboard.
+- **PDF.js Viewer:** Built-in viewer with in-PDF text search (highlights and notes coming soon).
 
 ---
 
