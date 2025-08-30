@@ -149,6 +149,27 @@
 
     /* Utility */
     .hidden{display:none !important}
+  
+    /* --- Full-window PDF modal mode --- */
+    #pdfModal.fullwindow{
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      max-width: none;
+      border-radius: 0;
+    }
+    #pdfModal.fullwindow .modal-header{
+      border-radius: 0;
+    }
+    #pdfModal.fullwindow .modal-body{
+      max-height: none;
+      height: calc(100vh - 120px);
+    }
+    #pdfModal.fullwindow #pdfFrame{
+      height: calc(100vh - 180px) !important;
+    }
+
   </style>
 </head>
 <body>
@@ -267,13 +288,9 @@
             <thead>
               <tr>
                 <th data-sort="title">Title</th>
-                <th data-sort="category">Category</th>
                 <th data-sort="status">Status</th>
                 <th data-sort="year">Year</th>
-                <th data-sort="priority">Priority</th>
                 <th>Tags</th>
-                <th data-sort="dueDate">Due</th>
-                <th data-sort="updatedAt">Updated</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -673,19 +690,18 @@
       const tr = el('tr');
       const tTags = (p.tags||[]).map(t=>`<span class="pill">${esc(t)}</span>`).join(' ');
       tr.innerHTML = `
+
         <td>${esc(p.title||'')}</td>
-        <td>${esc(niceCat(p.category))}</td>
         <td><span class="pill">${p.status==='progress'?'In Progress': p.status==='completed'?'Completed':'Planned'}</span></td>
         <td>${p.year? esc(String(p.year)) : ''}</td>
-        <td>${p.priority??''}</td>
         <td>${tTags}</td>
-        <td>${p.dueDate? esc(fmtDate(p.dueDate)) : ''}</td>
-        <td>${p.updatedAt? esc(fmtDate(p.updatedAt)) : ''}</td>
         <td>
           <button class="btn alt" data-act="view" data-id="${p.id}">View</button>
           <button class="btn alt" data-act="edit" data-id="${p.id}">Edit</button>
           ${p.pdfBlob? `<button class="btn" data-act="pdf" data-id="${p.id}">PDF</button>`:''}
-        </td>`;
+        </td>
+    
+      `;
       tb.append(tr);
     }
   }
@@ -755,7 +771,9 @@
     const url = URL.createObjectURL(p.pdfBlob);
     $('#pdfFrame').src = url;
     pdfModal.showModal();
-    const cleanup = ()=>{ URL.revokeObjectURL(url); $('#pdfFrame').src='about:blank'; };
+    // auto-enter full window mode on open
+    pdfModal.classList.add('fullwindow');
+    const cleanup = ()=>{ URL.revokeObjectURL(url); $('#pdfFrame').src='about:blank'; pdfModal.classList.remove('fullwindow'); };
     $('#closePdf').onclick = ()=>{ cleanup(); pdfModal.close(); };
     pdfModal.addEventListener('close', cleanup, {once:true});
   }
@@ -1053,7 +1071,45 @@
       '“Prioritize ruthlessly. Execute calmly.”'
     ];
     let qi = 0; setInterval(()=>{ qi=(qi+1)%quotes.length; $('#quote').textContent = quotes[qi]; }, 9000);
+
+  // ---- PDF full window + browser fullscreen controls ----
+  (function addPdfFullscreenControls(){
+    const header = document.querySelector('#pdfModal .modal-header');
+    const closeBtn = document.getElementById('closePdf');
+    if(!header || !closeBtn) return;
+
+    // Create buttons
+    const winBtn = document.createElement('button');
+    winBtn.className = 'btn ghost';
+    winBtn.id = 'toggleWindow';
+    winBtn.textContent = 'Full window';
+
+    const fsBtn = document.createElement('button');
+    fsBtn.className = 'btn alt';
+    fsBtn.id = 'pdfFullscreen';
+    fsBtn.textContent = 'Fullscreen';
+
+    // Insert just before the Close button
+    header.insertBefore(winBtn, closeBtn);
+    header.insertBefore(fsBtn, closeBtn);
+
+    // Wire up actions
+    winBtn.addEventListener('click', ()=>{
+      const dlg = document.getElementById('pdfModal');
+      dlg.classList.toggle('fullwindow');
+      winBtn.textContent = dlg.classList.contains('fullwindow') ? 'Exit full window' : 'Full window';
+    });
+
+    fsBtn.addEventListener('click', ()=>{
+      const frame = document.getElementById('pdfFrame');
+      if(frame && frame.requestFullscreen) frame.requestFullscreen();
+      else if(frame && frame.webkitRequestFullscreen) frame.webkitRequestFullscreen(); // Safari
+      else if(frame && frame.msRequestFullscreen) frame.msRequestFullscreen();       // legacy
+    });
+  })();
+
   })();
   </script>
 </body>
 </html>
+
